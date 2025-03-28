@@ -49,15 +49,22 @@ app.post("/webhook", async (req, res) => {
             const messageType = message.type;
 
             if (messageType === "template") {
-                const templateName = message.template.name;
-                const languageCode = message.template.language.code;
-                console.log(`📩 Received Template Message from ${from}: ${templateName} [${languageCode}]`);
+                console.log(`📩 Received Template Message from ${from}`);
                 return res.sendStatus(200);
             }
 
             if (message.text) {
-                console.log(`💬 User replied from ${from}: ${message.text.body}`);
-                await sendMessage(phone_number_id, from, `Hi! You said: ${message.text.body}`);
+                const messageText = message.text.body.trim().toLowerCase();
+                console.log(`💬 User replied from ${from}: ${messageText}`);
+                
+                if (messageText === "hi") {
+                    console.log(`🤖 Sending template message to ${from}`);
+                    // await sendTemplateMessage(phone_number_id, from);
+                     await sendTemplateMessage(phone_number_id, from);
+                } else {
+                    // await sendMessage(phone_number_id, from, `Hi! You said: ${messageText}`);
+                    await sendTemplateMessage(phone_number_id, from);
+                }
             }
         }
 
@@ -68,14 +75,7 @@ app.post("/webhook", async (req, res) => {
     }
 });
 
-
-app.post('/webhook', (req, res) => {
-    console.log('Webhook received!', req.body);
-    res.status(200).send('OK');
-});
-
-
-// 📌 Function to Send a WhatsApp Message
+// 📌 Function to Send a WhatsApp Text Message
 async function sendMessage(phone_number_id, recipient, text) {
     try {
         await axios.post(
@@ -90,6 +90,38 @@ async function sendMessage(phone_number_id, recipient, text) {
         console.log(`✅ Message sent to ${recipient}: ${text}`);
     } catch (error) {
         console.error("❌ Error sending message:", error.response?.data || error.message);
+    }
+}
+
+// 📌 Function to Send a WhatsApp Template Message
+async function sendTemplateMessage(phone_number_id, recipient) {
+    try {
+        await axios.post(
+            `https://graph.facebook.com/v13.0/${phone_number_id}/messages?access_token=${TOKEN}`,
+            {
+                messaging_product: "whatsapp",
+                to: recipient,
+                type: "template",
+                template: {
+                    name: "bluebex_info",
+                    language: { code: "en" },
+                    components: [
+                        {
+                            type: "header",
+                            parameters: [{ type: "image", image: { id: "9801615363183757" } }]
+                        },
+                        {
+                            type: "body",
+                            parameters: [{ type: "text", text: "Jithin" }]
+                        }
+                    ]
+                }
+            },
+            { headers: { "Content-Type": "application/json" } }
+        );
+        console.log(`✅ Template message sent to ${recipient}`);
+    } catch (error) {
+        console.error("❌ Error sending template message:", error.response?.data || error.message);
     }
 }
 
