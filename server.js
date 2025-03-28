@@ -56,15 +56,25 @@ app.post("/webhook", async (req, res) => {
             if (message.text) {
                 const messageText = message.text.body.trim().toLowerCase();
                 console.log(`💬 User replied from ${from}: ${messageText}`);
+            
+                // Recognizing different variations of greetings
+                const greetings = [
+                    "hi", "hii", "hiii", "hello", "hey", "heyy", "heyyy",
+                    "good morning", "good afternoon", "good evening", "good night",
+                    "morning", "afternoon", "evening", "night",
+                    "what's up", "whats up", "sup", "yo", "hola", "howdy",
+                    "namaste", "bonjour", "salut", "greetings"
+                ];
                 
-                if (messageText === "hi") {
-                    console.log(`🤖 Sending template message to ${from}`);
-                    // await sendTemplateMessage(phone_number_id, from);
-                     await sendTemplateMessage(phone_number_id, from);
-                } else {
-                    // await sendMessage(phone_number_id, from, `Hi! You said: ${messageText}`);
+                if (greetings.some(greet => messageText.includes(greet))) {
+                    console.log(`🤖 Greeting detected! Sending template to ${from}...`);
                     await sendTemplateMessage(phone_number_id, from);
+                } else {
+                    console.log(`📩 Sending Contact Us message to ${from}...`);
+                    const contactMessage = `🙏 Thank you for reaching out to *Bluebex Software*! \n\n📞 *Need Assistance?* \n We're here to help! \n📧 Email: bluebexsoftware@gmail.com \n🌐 Website: https://bluebex.in \n📱 Call Us:  +919164949099 \n\nWe truly appreciate your interest and look forward to assisting you! 🚀`;
+                    await sendMessage(phone_number_id, from, contactMessage);
                 }
+                
             }
         }
 
