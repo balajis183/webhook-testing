@@ -122,7 +122,7 @@ async function sendTemplateMessage(phone_number_id, recipient) {
                         },
                         {
                             type: "body",
-                            parameters: [{ type: "text", text: "Jithin" }]
+                            parameters: [{ type: "text", text: "user," }]
                         }
                     ]
                 }
