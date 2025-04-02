@@ -109,7 +109,7 @@ async function sendMessage(phone_number_id, recipient, text) {
 async function sendTemplateMessage(phone_number_id, recipient, profileName) {
     try {
         await axios.post(
-            `https://graph.facebook.com/v13.0/${phone_number_id}/messages?access_token=${TOKEN}`,
+            `https://graph.facebook.com/v22.0/${phone_number_id}/messages?access_token=${TOKEN}`,
             {
                 messaging_product: "whatsapp",
                 to: recipient,
@@ -124,7 +124,7 @@ async function sendTemplateMessage(phone_number_id, recipient, profileName) {
                         },
                         {
                             type: "body",
-                            parameters: [{ type: "text", text: `${profileName}`}]
+                            parameters: [{ type: "text", text: `${profileName},`}]
                         }
                     ]
                 }
