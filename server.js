@@ -47,7 +47,9 @@ app.post("/webhook", async (req, res) => {
             const message = messages[0];
             const from = message.from;
             const messageType = message.type;
-
+            const profileName = changes?.contacts?.[0]?.profile?.name || "User"; // Get name or fallback to "User"
+            console.log("📌 Full message received:", JSON.stringify(message, null, 2));
+            console.log("👤 Extracted profile Name:", profileName);
             if (messageType === "template") {
                 console.log(`📩 Received Template Message from ${from}`);
                 return res.sendStatus(200);
@@ -68,7 +70,7 @@ app.post("/webhook", async (req, res) => {
                 
                 if (greetings.some(greet => messageText.includes(greet))) {
                     console.log(`🤖 Greeting detected! Sending template to ${from}...`);
-                    await sendTemplateMessage(phone_number_id, from);
+                    await sendTemplateMessage(phone_number_id, from, profileName);
                 } else {
                     console.log(`📩 Sending Contact Us message to ${from}...`);
                     const contactMessage = `🙏 Thank you for reaching out to *Bluebex Software*! \n\n📞 *Need Assistance?* \n We're here to help! \n📧 Email: bluebexsoftware@gmail.com \n🌐 Website: https://bluebex.in \n📱 Call Us:  +919164949099 \n\nWe truly appreciate your interest and look forward to assisting you! 🚀`;
@@ -104,7 +106,7 @@ async function sendMessage(phone_number_id, recipient, text) {
 }
 
 // 📌 Function to Send a WhatsApp Template Message
-async function sendTemplateMessage(phone_number_id, recipient) {
+async function sendTemplateMessage(phone_number_id, recipient, profileName) {
     try {
         await axios.post(
             `https://graph.facebook.com/v13.0/${phone_number_id}/messages?access_token=${TOKEN}`,
@@ -122,7 +124,7 @@ async function sendTemplateMessage(phone_number_id, recipient) {
                         },
                         {
                             type: "body",
-                            parameters: [{ type: "text", text: "user," }]
+                            parameters: [{ type: "text", text: `${profileName}`}]
                         }
                     ]
                 }
