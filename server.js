@@ -41,9 +41,9 @@ app.post("/webhook", async (req, res) => {
     const messages = changes?.messages;
     const profileName = changes?.contacts?.[0]?.profile?.name || "User";
 
-    if (!messages || !phone_number_id) {
-      console.log("⚠️ No messages or phone_number_id. Skipping...");
-      return res.sendStatus(200);
+    if (!phone_number_id) {
+        console.error("❌ No phone number ID found in webhook payload.");
+        return res.sendStatus(400);
     }
 
     const message = messages[0];
